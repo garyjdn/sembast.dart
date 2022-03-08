@@ -379,8 +379,21 @@ class SembastStore {
   }
 
   /// Find keys in a transaction.
-  Future<List> txnFindKeys(SembastTransaction? txn, Finder? finder) async {
+  Future<List> txnFindKeys(
+    SembastTransaction? txn,
+    Finder? finder, [
+    String? keyPrefix,
+  ]) async {
     var records = await txnFindRecords(txn, finder);
+    if (keyPrefix != null && keyPrefix.isNotEmpty) {
+      records = records.where((record) {
+        if (record.key is String) {
+          return (record.key as String).startsWith(keyPrefix);
+        } else {
+          return false;
+        }
+      }).toList();
+    }
     return records.map((SembastRecord record) => record.key).toList();
   }
 
